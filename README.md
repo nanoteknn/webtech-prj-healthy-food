@@ -5,7 +5,7 @@ NGpos este o aplicație web care îi ajută pe proprietarii de magazine mici și
 ## Utilizatori
 
 * administratorul magazinului
-* vazator
+* vanzator
 
 ## Funcționalități principale
 
