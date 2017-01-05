@@ -1,20 +1,6 @@
-# webtech-prj-ngpos
+# webtech-prj-food_db
 
-NGpos este o aplicație web care îi ajută pe proprietarii de magazine mici și medii să își gestioneze mai bine vânzările.
-
-## Utilizatori
-
-* administratorul magazinului
-* vanzator
-
-## Funcționalități principale
-
-Ca administrator al magazinului vreau să folosesc o interfață prietenoasă prin care îmi gestionez produsele.
-Ca administrator al magazinului vreau să consult rapoarte pe baza cărora să înteleg cum merge afacerea mea.
-Ca vanzător vreau să pot prelua comenzile clieților cât mai usor cu putință
-
-## Tehnologii
-
-* HTML&CSS
-* AngujarJS
-* NodeJs (Express, Sequelize)
+Aceasta este o aplicatie in care poti adauga diferite bauturi sau mancaruri si sa 
+iti calculezi caloriile dupa o anumita masa. De asemenea, poti sa iti setezi anumite 
+puncte pe care sa le primesti in functie de elementul selectat. 
+De exemplu o bere are 300 de calorii si -100 de puncte deoarece nu este foarte sanatoasa.

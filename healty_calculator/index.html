@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script type="text/javascript">
+            /*global $*/
+            $(document).ready(function(){
+                
+                var sumOfCalories = 0;
+                var sumOfPoints = 0;
+                var clickVector = [];
+                var createrActive = true;
+                var idToChangeOrDelete;
+                
+                function loadButtons()
+                {
+                    $("#feedback_text").text("");
+                    
+                     $.ajax({url:'/items_get', success: function(data) {
+                     $('#create_button').text = "Add Item";
+                     $('#items').empty();
+                     for(var i = 0; i<data.length; i++) {
+                        $('#items').append("<button id='frontId"+i+"' style='width:10%'>"+data[i].id+"</button>");
+                        $('#items').append("<button id='"+i+"' class='select' style='width:70%'>"+
+                        data[i].name+" Calories "+ data[i].calories + " Points " + data[i].points +"</button>");
+                        $('#items').append("<button id='"+i+"' class='edit' style='width:10%'>"+"EDIT"+"</button>");
+                        $('#items').append("<button id='"+i+"' class='delete' style='width:10%'>"+"DELETE"+"</button>");
+                        $('#items').append("<br>");
+                        clickVector.push(0);
+                    }
+                    
+                    $("#items").on("click", "button.select", function(event){
+                        var target = event.target;
+                        var nrId = target.id;
+                        if(clickVector[nrId] == 1)
+                        {
+                            target.style.background="";
+                            clickVector[nrId] = 0;
+                            
+                            var element = data[nrId];
+                            sumOfCalories -= element.calories;
+                            sumOfPoints -= element.points;
+                            
+                            $("#stat_calories").text("The number of calories is : " + sumOfCalories);
+                            $("#stat_points").text("The number of calories is : " + sumOfPoints);
+                        }
+                        else
+                        {
+                            target.style.background="lightgreen";
+                            clickVector[nrId]++;
+                            
+                            var element = data[nrId];
+                            sumOfCalories += element.calories;
+                            sumOfPoints += element.points;
+                            
+                            $("#stat_calories").text("The number of calories is : " + sumOfCalories);
+                            $("#stat_points").text("The number of calories is : " + sumOfPoints);
+                        }
+                           
+                    });
+                
+                    $("#items").on("click", "button.edit", function(event){
+                        var sum = 0;
+                        for(var i=0;i<clickVector.length;i++)
+                        {
+                            sum += clickVector[i];
+                        }
+                        
+                        if(sum != 0)
+                        {
+                            $("#feedback_text").text("Elements are selected!");
+                            setInterval(function(){$("#feedback_text").text("");},3000);
+                            return;
+                        }
+                        
+                        var target = event.target;
+                        var nrId = target.id;
+                        var targetData = data[nrId];
+                        var btn = $('#frontId'+nrId);
+                        idToChangeOrDelete = btn.text();
+                        createrActive = false;
+                        $('#create_button').text("Edit");
+                        $('#input_name').val(targetData.name).removeAttr('placeholder');
+                        $('#input_calories').val(targetData.calories).removeAttr('placeholder');
+                        $('#input_points').val(targetData.points).removeAttr('placeholder');
+                    });
+                    
+                    $("#items").on("click", "button.delete", function(event){
+                        
+                        var sum = 0;
+                        for(var i=0;i<clickVector.length;i++)
+                        {
+                            sum += clickVector[i];
+                        }
+                        
+                        if(sum != 0)
+                        {
+                            $("#feedback_text").text("Elements are selected!");
+                            setInterval(function(){$("#feedback_text").text("");},3000);
+                            return;
+                        }
+                        
+                        var target = event.target;
+                        var nrId = target.id;
+                         var btn = $('#frontId'+nrId);
+                        idToChangeOrDelete = btn.text();
+                        var targetData = data[nrId];
+                        $.ajax({
+                          url: '/items/:id_delete',
+                          dataType: 'text',
+                          type: 'DELETE',
+                          async:false,
+                          data: { 
+                          id: idToChangeOrDelete
+                          },
+                          success: function(data) {
+                            alert('Load was performed.');
+                          },
+                          error : function(request, status, error) {
+                            setInterval(function(){location.reload()},2000);
+                          }
+                        });
+                        idToChangeOrDelete = null;
+                    });
+                
+                    }});
+                }
+                
+                loadButtons();
+                
+                $("#save_report").click(function(event) {
+                    $.ajax({ 
+                       url: '/reports_post',
+                       dataType: 'text',
+                       type: 'POST',
+                       cache: false, 
+                       data: { 
+                           points: $('#stat_points').text(),
+                           calories: $('#stat_calories').text()
+                           }, 
+                       success: function(data){
+                          alert('Success!');
+                       }
+                       , error: function(jqXHR, textStatus, err){
+                       }
+                    });
+                    
+                    setInterval(function(){location.reload()},3000);
+                });
+                
+                $('#create_button').click(function(event ) {
+                    
+                    var name = $("#input_name").val();
+                    var calories = $("#input_calories").val();
+                    var points = $("input_points").val();
+                    
+                    if(calories <= 0 || points <= 0 || name.length == 0)
+                    {
+                        $("#feedback_text").text("WRONG INPUT!");
+                        setInterval(function(){$("#feedback_text").text("");},3000);
+                        return;
+                    }
+                    
+                    if(!createrActive)
+                    {
+                        var id = idToChangeOrDelete;
+                          $.ajax({
+                          url: '/items/:id_update',
+                          type: 'PUT',
+                          data: { 
+                          id: idToChangeOrDelete,
+                          name: $('#input_name').val(),
+                          calories: $('#input_calories').val(),
+                          points: $('#input_points').val()
+                          },
+                          success: function(data) {
+                            alert('Load was performed.');
+                          }, 
+                          error: function(error) {
+                              var a;
+                          }
+                        });    
+                        createrActive = true;
+                        idToChangeOrDelete = null;
+                    }
+                    else
+                    {
+                    $.ajax({ 
+                       url: '/items_post',
+                       dataType: 'text',
+                       type: 'POST',
+                       cache: false, 
+                       data: { 
+                           name: $('#input_name').val(),
+                           calories: $('#input_calories').val(),
+                           points: $('#input_points').val()
+                           }, 
+                       success: function(data){
+                          alert('Success!');
+                       }
+                       , error: function(jqXHR, textStatus, err){
+                       }
+                    });
+                    }
+                    
+                    setInterval(function(){location.reload()},3000);
+                 });   
+            });
+        </script>
+    </head>
+    <body>
+        <h2 style="width: 600x; 
+        height:100%; margin: auto; text-align:center ">Healthy Food Calculator</h2>
+        <br>
+        <br>
+        <div id="items" style="width: 600px; 
+        height:100%; margin: auto">
+            
+        </div>
+        <div id="addItems" style="width: 600px; 
+        height:100%; margin: auto">
+            <input id="input_name" placeholder="Food Name" style="width: 23%" type="text" name="name"/>
+            <input id="input_calories" placeholder="Calories" style="width: 23%" type="text" name="calories"/>
+            <input id="input_points" placeholder="Points" style="width: 23%" type="text" name="points"/>
+            <button id="create_button" style="width: 25%">Add Item</button>
+            <p id="feedback_text" style="width:40%; margin: auto; color: red"></p>
+        </div>
+        <br>
+        <br>
+        <div id="statistics" style="width: 20%; 
+        height:100%; margin: auto">
+            <p id="stat_points" style="margin: auto; text-align: center">Number of points: </p>
+            <p id="stat_calories" style="margin: auto; text-align: center">Number of calories: </p>
+            <button id="save_report" style="width:100%; margin: auto">Save</button>
+        </div>
+    </body>
+</html>

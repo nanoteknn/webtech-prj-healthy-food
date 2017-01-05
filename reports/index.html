@@ -1,1 +1,39 @@
-This is the reports module
+<!DOCTYPE html>
+<html style="background: grey">
+    <head>
+        <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script type="text/javascript">
+            /*global $*/
+            
+            var totalPoints = 0;
+            
+            $(document).ready(function()
+            {
+                $.ajax({url:'/reports_get', success: function(data) 
+                {
+                    for(var i = 0; i<data.length; i++) {
+                        totalPoints += data[i].points;
+                        $('#items').append("<button id='"+i+"' class='select' style='width:100%'>"+
+                        data[i].createdAt+" Calories "+ data[i].calories + " Points " + data[i].points +"</button>");
+                        $('#items').append("<br>");
+                    }
+                    
+                    $('#p_totalPoints').text("Total points : " + totalPoints + "");
+                }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <H2 style="width: 150px; height: 50px; margin: auto; color: black; text-align: center">Food Reports</H3>
+        <div style="width: 350px; height: 200px; margin: auto" id="items" style="width: 600px; 
+        height:100%; margin: auto">
+            
+        </div>
+        <div style="width: 150px; height: 200px; margin: auto">
+            <p stye="color: black" id="p_totalPoints">
+               
+            </p>
+        </div>
+    </body>
+</html>
