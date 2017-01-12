@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+     <!-- Load the AngularJS library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
         <script type="text/javascript">
             /*global $*/
+            
+             var sumOfCalories = 0;
+             var sumOfPoints = 0;
+            
             $(document).ready(function(){
                 
                 var sumOfCalories = 0;
@@ -21,7 +27,7 @@
                      $('#items').empty();
                      for(var i = 0; i<data.length; i++) {
                         $('#items').append("<button id='frontId"+i+"' style='width:10%'>"+data[i].id+"</button>");
-                        $('#items').append("<button id='"+i+"' class='select' style='width:70%'>"+
+                        $('#items').append("<button ng-click='updateValue()' id='"+i+"' class='select' style='width:70%'>"+
                         data[i].name+" Calories "+ data[i].calories + " Points " + data[i].points +"</button>");
                         $('#items').append("<button id='"+i+"' class='edit' style='width:10%'>"+"EDIT"+"</button>");
                         $('#items').append("<button id='"+i+"' class='delete' style='width:10%'>"+"DELETE"+"</button>");
@@ -41,8 +47,8 @@
                             sumOfCalories -= element.calories;
                             sumOfPoints -= element.points;
                             
-                            $("#stat_calories").text("The number of calories is : " + sumOfCalories);
-                            $("#stat_points").text("The number of calories is : " + sumOfPoints);
+                            angular.element(document.getElementById('statistics')).scope().updateValue(sumOfPoints, sumOfCalories);
+                            angular.element(document.getElementById('statistics')).scope().$apply();
                         }
                         else
                         {
@@ -53,8 +59,8 @@
                             sumOfCalories += element.calories;
                             sumOfPoints += element.points;
                             
-                            $("#stat_calories").text("The number of calories is : " + sumOfCalories);
-                            $("#stat_points").text("The number of calories is : " + sumOfPoints);
+                           angular.element(document.getElementById('statistics')).scope().updateValue(sumOfPoints, sumOfCalories);
+                           angular.element(document.getElementById('statistics')).scope().$apply();
                         }
                            
                     });
@@ -68,8 +74,15 @@
                         
                         if(sum != 0)
                         {
-                            $("#feedback_text").text("Elements are selected!");
-                            setInterval(function(){$("#feedback_text").text("");},3000);
+                            angular.element(document.getElementById('addItems')).scope().writeFeedbackText("Elements are selected!");
+                            angular.element(document.getElementById('addItems')).scope().$apply();
+                            
+                            setInterval(function(){
+                                angular.element(document.getElementById('addItems')).scope().writeFeedbackText("");
+                                angular.element(document.getElementById('addItems')).scope().$apply();
+                            },3000);
+                            
+                            
                             return;
                         }
                         
@@ -95,8 +108,15 @@
                         
                         if(sum != 0)
                         {
-                            $("#feedback_text").text("Elements are selected!");
-                            setInterval(function(){$("#feedback_text").text("");},3000);
+                            angular.element(document.getElementById('addItems')).scope().writeFeedbackText("Elements are selected!");
+                            angular.element(document.getElementById('addItems')).scope().$apply();
+                            
+                            setInterval(function(){
+                                angular.element(document.getElementById('addItems')).scope().writeFeedbackText("");
+                                angular.element(document.getElementById('addItems')).scope().$apply();
+                                
+                            },3000);
+                            
                             return;
                         }
                         
@@ -206,9 +226,37 @@
                     setInterval(function(){location.reload()},3000);
                  });   
             });
+        
+            var app1 = angular.module('app1',[]);
+        
+            app1.controller('controller1', function($scope){
+            $scope.ajpoints = 0;
+            $scope.ajcalories = 0;
+           
+            $scope.updateValue = function(points, calories) {
+              $scope.ajpoints = points;
+              $scope.ajcalories = calories;
+             };
+             
+             $scope.writeFeedbackText = function(text) {
+               $scope.fdbTxt = text;  
+             };
+            });
+            
+            app1.controller('controller2', function($scope){
+            $scope.fdbTxt = "";
+             
+             $scope.writeFeedbackText = function(text) {
+               $scope.fdbTxt = text;  
+             };
+            });
+            
+            
+
         </script>
+        
     </head>
-    <body>
+    <body ng-app="app1" ng-init="">
         <h2 style="width: 600x; 
         height:100%; margin: auto; text-align:center ">Healthy Food Calculator</h2>
         <br>
@@ -217,20 +265,20 @@
         height:100%; margin: auto">
             
         </div>
-        <div id="addItems" style="width: 600px; 
+        <div  ng-controller="controller2" id="addItems" style="width: 600px; 
         height:100%; margin: auto">
             <input id="input_name" placeholder="Food Name" style="width: 23%" type="text" name="name"/>
             <input id="input_calories" placeholder="Calories" style="width: 23%" type="text" name="calories"/>
             <input id="input_points" placeholder="Points" style="width: 23%" type="text" name="points"/>
             <button id="create_button" style="width: 25%">Add Item</button>
-            <p id="feedback_text" style="width:40%; margin: auto; color: red"></p>
+            <p id="feedback_text" style="width:40%; margin: auto; color: red">Total points : {{fdbTxt}}</p>
         </div>
         <br>
         <br>
-        <div id="statistics" style="width: 20%; 
+        <div ng-controller="controller1" id="statistics" style="width: 20%; 
         height:100%; margin: auto">
-            <p id="stat_points" style="margin: auto; text-align: center">Number of points: </p>
-            <p id="stat_calories" style="margin: auto; text-align: center">Number of calories: </p>
+            <p id="stat_points" style="margin: auto; text-align: center">Number of points: {{ajpoints}} </p>
+            <p id="stat_calories" style="margin: auto; text-align: center">Number of calories: {{ajcalories}} </p>
             <button id="save_report" style="width:100%; margin: auto">Save</button>
         </div>
     </body>

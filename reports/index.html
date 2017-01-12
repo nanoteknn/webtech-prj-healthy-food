@@ -1,11 +1,25 @@
 <!DOCTYPE html>
 <html style="background: grey">
     <head>
+         <!-- Load the AngularJS library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
         <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
         <script type="text/javascript">
             /*global $*/
             
             var totalPoints = 0;
+            
+            var appx = angular.module('appx',[]);
+        
+            appx.controller('controller3', function($scope){
+            $scope.ajpoints = 0;
+           
+            $scope.updateValue = function(points) {
+              $scope.ajpoints = points;
+             };
+             
+            });
+            
             
             $(document).ready(function()
             {
@@ -18,21 +32,22 @@
                         $('#items').append("<br>");
                     }
                     
-                    $('#p_totalPoints').text("Total points : " + totalPoints + "");
+                    angular.element(document.getElementById('totalPoints')).scope().updateValue(totalPoints);
+                    angular.element(document.getElementById('totalPoints')).scope().$apply();
                 }
                 });
             });
         </script>
     </head>
-    <body>
+    <body  ng-app="appx" ng-init="">
         <H2 style="width: 150px; height: 50px; margin: auto; color: black; text-align: center">Food Reports</H3>
-        <div style="width: 350px; height: 200px; margin: auto" id="items" style="width: 600px; 
+        <div style="width: 350px; height: 700px; margin: auto" id="items" style="width: 600px; 
         height:100%; margin: auto">
             
         </div>
-        <div style="width: 150px; height: 200px; margin: auto">
+        <div ng-controller="controller3" id = "totalPoints" style="width: 150px; height: 200px; margin: auto">
             <p stye="color: black" id="p_totalPoints">
-               
+               {{ajpoints}}
             </p>
         </div>
     </body>
