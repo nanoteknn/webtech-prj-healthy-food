@@ -20,7 +20,7 @@
                 
                 function loadButtons()
                 {
-                    $("#feedback_text").text("");
+                    //$("#feedback_text").text("");
                     
                      $.ajax({url:'/items_get', success: function(data) {
                      $('#create_button').text = "Add Item";
@@ -266,12 +266,12 @@
             
         </div>
         <div  ng-controller="controller2" id="addItems" style="width: 600px; 
-        height:100%; margin: auto">
+        height:200px; margin: auto">
             <input id="input_name" placeholder="Food Name" style="width: 23%" type="text" name="name"/>
             <input id="input_calories" placeholder="Calories" style="width: 23%" type="text" name="calories"/>
             <input id="input_points" placeholder="Points" style="width: 23%" type="text" name="points"/>
             <button id="create_button" style="width: 25%">Add Item</button>
-            <p id="feedback_text" style="width:40%; margin: auto; color: red">Total points : {{fdbTxt}}</p>
+            <p id="feedback_text" style="width:40%; height: 100px; margin: auto; color: red">{{fdbTxt}}</p>
         </div>
         <br>
         <br>
